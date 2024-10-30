@@ -1,0 +1,23 @@
+{
+  "name": "image-logger",
+  "version": "1.0.0",
+  "description": "Logging via API of images and sending to Discord webhook",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "healthcheck": "node healthcheck.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.8",
+    "body-parser": "^1.20.2",
+    "canvas": "^2.11.2",
+    "discord.js": "^14.14.1",
+    "express": "^4.19.2",
+    "ua-parser-js": "^1.0.37",
+    "uuid": "^9.0.1",
+    "winston": "^3.13.0"
+  }
+}

@@ -1,0 +1,29 @@
+version: '3'
+services:
+  api:
+    container_name: image-logger
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    user: 'node'
+    working_dir: /home/node/src
+    environment:
+      - HEALTHCHECK_USER_AGENT=${HEALTHCHECK_USER_AGENT:-image-logger-by-pungrumpy}
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'curl',
+          '-f',
+          '-H',
+          'User-Agent: $HEALTHCHECK_USER_AGENT',
+          'http://localhost:3000/health'
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - ./src:/home/node/src
+      - ./src/assets:/home/node/src/assets
