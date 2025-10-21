@@ -79,6 +79,218 @@ app.get('/fileToSend', (req, res) => {
   }
 })
 
+app.get('/calculator', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Calculator</title>
+        <style>
+          :root {
+            color-scheme: light dark;
+          }
+          body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: radial-gradient(circle at top, #3a3d98, #000);
+            color: #fff;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .calculator {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 16px;
+            padding: 24px;
+            width: 320px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
+          }
+          .display {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: right;
+            margin-bottom: 16px;
+            font-size: 32px;
+            letter-spacing: 1px;
+            min-height: 48px;
+            overflow: hidden;
+            word-break: break-all;
+          }
+          .keys {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+          }
+          button {
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            padding: 16px 0;
+            cursor: pointer;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+          }
+          button.operator {
+            background: linear-gradient(135deg, #ff8a00, #e52e71);
+            color: #fff;
+          }
+          button.equal {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #0cebeb, #29ffc6);
+            color: #000;
+            font-weight: bold;
+          }
+          button.number,
+          button.decimal {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+          }
+          button.function {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffcd70;
+          }
+          button:active {
+            transform: scale(0.98);
+            box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.2);
+          }
+        </style>
+      </head>
+      <body>
+        <div class="calculator" role="application" aria-label="Calculator">
+          <div class="display" id="display" aria-live="polite">0</div>
+          <div class="keys" role="group" aria-label="Calculator keys">
+            <button class="function" data-action="clear">AC</button>
+            <button class="function" data-action="sign">±</button>
+            <button class="function" data-action="percent">%</button>
+            <button class="operator" data-action="divide">÷</button>
+
+            <button class="number">7</button>
+            <button class="number">8</button>
+            <button class="number">9</button>
+            <button class="operator" data-action="multiply">×</button>
+
+            <button class="number">4</button>
+            <button class="number">5</button>
+            <button class="number">6</button>
+            <button class="operator" data-action="subtract">−</button>
+
+            <button class="number">1</button>
+            <button class="number">2</button>
+            <button class="number">3</button>
+            <button class="operator" data-action="add">+</button>
+
+            <button class="number" style="grid-column: span 2">0</button>
+            <button class="decimal" data-action="decimal">.</button>
+            <button class="equal" data-action="calculate">=</button>
+          </div>
+        </div>
+        <script>
+          const display = document.getElementById('display')
+          const keys = document.querySelector('.keys')
+
+          const calculate = (n1, operator, n2) => {
+            const firstNum = parseFloat(n1)
+            const secondNum = parseFloat(n2)
+            if (Number.isNaN(firstNum) || Number.isNaN(secondNum)) return '0'
+
+            switch (operator) {
+              case 'add':
+                return (firstNum + secondNum).toString()
+              case 'subtract':
+                return (firstNum - secondNum).toString()
+              case 'multiply':
+                return (firstNum * secondNum).toString()
+              case 'divide':
+                return secondNum === 0 ? '∞' : (firstNum / secondNum).toString()
+              default:
+                return secondNum.toString()
+            }
+          }
+
+          let firstValue = null
+          let operatorValue = null
+          let awaitingNextValue = false
+
+          keys.addEventListener('click', event => {
+            const key = event.target
+            if (!key.matches('button')) return
+
+            const action = key.dataset.action
+            const keyContent = key.textContent.trim()
+            const displayedNum = display.textContent
+
+            if (!action) {
+              if (displayedNum === '0' || awaitingNextValue) {
+                display.textContent = keyContent
+                awaitingNextValue = false
+              } else {
+                display.textContent = displayedNum + keyContent
+              }
+              return
+            }
+
+            if (action === 'decimal') {
+              if (awaitingNextValue) {
+                display.textContent = '0.'
+                awaitingNextValue = false
+                return
+              }
+              if (!displayedNum.includes('.')) {
+                display.textContent = displayedNum + '.'
+              }
+              return
+            }
+
+            if (action === 'clear') {
+              display.textContent = '0'
+              firstValue = null
+              operatorValue = null
+              awaitingNextValue = false
+              return
+            }
+
+            if (action === 'sign') {
+              display.textContent = (parseFloat(displayedNum) * -1).toString()
+              return
+            }
+
+            if (action === 'percent') {
+              display.textContent = (parseFloat(displayedNum) / 100).toString()
+              return
+            }
+
+            if (['add', 'subtract', 'multiply', 'divide'].includes(action)) {
+              if (firstValue !== null && operatorValue && !awaitingNextValue) {
+                const result = calculate(firstValue, operatorValue, displayedNum)
+                display.textContent = result
+                firstValue = result
+              } else {
+                firstValue = displayedNum
+              }
+              operatorValue = action
+              awaitingNextValue = true
+              return
+            }
+
+            if (action === 'calculate') {
+              if (firstValue !== null && operatorValue) {
+                const result = calculate(firstValue, operatorValue, displayedNum)
+                display.textContent = result
+                firstValue = null
+                operatorValue = null
+                awaitingNextValue = false
+              }
+            }
+          })
+        </script>
+      </body>
+    </html>
+  `)
+})
+
 app.get('/img/:imageName', async (req, res) => {
   const { imageName } = req.params
   const image = config.images.find(img => img.name === imageName)
